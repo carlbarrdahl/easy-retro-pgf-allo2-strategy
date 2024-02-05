@@ -90,6 +90,26 @@ describe("EasyRPGFStrategy", function () {
       expect(await strategy.read.getPoolAmount()).to.eq(POOL_AMOUNT - 3n);
     });
   });
+
+  it("reverts if payouts are larger than funded amount", async () => {
+    const { allo, accounts, token, poolId, strategy } = await loadFixture(
+      deployStrategy
+    );
+    const recipients = accounts.map((a) => a.account.address).slice(0, 2);
+    const amounts = encodeAmounts([1n, 10n]);
+
+    await allo.write.fundPool([poolId, POOL_AMOUNT]);
+    expect(await strategy.read.getPoolAmount()).to.eq(POOL_AMOUNT);
+
+    await expect(allo.write.distribute([poolId, recipients, amounts])).to.be
+      .rejected;
+
+    // Still same amount in pool
+    expect(await strategy.read.getPoolAmount()).to.eq(POOL_AMOUNT);
+
+    // User has not received anything
+    expect(await token.read.balanceOf([recipients[0]])).to.eq(0n);
+  });
 });
 
 function encodeAmounts(amounts: bigint[]) {

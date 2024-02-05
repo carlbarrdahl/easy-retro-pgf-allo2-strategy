@@ -2,7 +2,8 @@
   "name": "easy-retro-pgf-allo2-strategy",
   "scripts": {
     "build": "forge build",
-    "test": "REPORT_GAS=true hardhat test",
+    "test": "hardhat test",
+    "test:gas": "REPORT_GAS=true hardhat test",
     "deploy": "hardhat run scripts/deploy.ts"
   },
   "devDependencies": {
