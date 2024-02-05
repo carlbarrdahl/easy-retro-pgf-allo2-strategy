@@ -1,0 +1,19 @@
+{
+  "name": "easy-retro-pgf-allo2-strategy",
+  "scripts": {
+    "build": "forge build",
+    "test": "REPORT_GAS=true hardhat test",
+    "deploy": "hardhat run scripts/deploy.ts"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox-viem": "^2.0.0",
+    "hardhat": "^2.19.5"
+  },
+  "dependencies": {
+    "@nomicfoundation/hardhat-foundry": "^1.1.1",
+    "@openzeppelin/contracts": "^4.9.3",
+    "@openzeppelin/contracts-upgradeable": "^4.9.3",
+    "allo-v2": "github:allo-protocol/allo-v2",
+    "solady": "^0.0.110"
+  }
+}
