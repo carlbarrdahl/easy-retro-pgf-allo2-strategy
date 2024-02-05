@@ -24,7 +24,7 @@ contract EasyRPGFStrategy is BaseStrategy, ReentrancyGuard {
     function _distribute(
         address[] memory _recipientIds,
         bytes memory _recipientAmounts,
-        address _sender //onlyInactivePool onlyPoolManager(_sender)
+        address _sender
     ) internal virtual override onlyPoolManager(_sender) {
         // Decode amounts from memory param
         uint256[] memory amounts = abi.decode(_recipientAmounts, (uint256[]));
