@@ -29,6 +29,10 @@ contract EasyRPGFStrategy is BaseStrategy, ReentrancyGuard {
         // Decode amounts from memory param
         uint256[] memory amounts = abi.decode(_recipientAmounts, (uint256[]));
 
+        // Assert at least one recipient
+        if (_recipientIds.length == 0) {
+            revert INPUT_LENGTH_MISMATCH();
+        }
         // Assert recipient and amounts length are equal
         if (_recipientIds.length != amounts.length) {
             revert INPUT_LENGTH_MISMATCH();
