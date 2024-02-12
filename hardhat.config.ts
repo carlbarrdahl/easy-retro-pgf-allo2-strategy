@@ -2,6 +2,7 @@ import { HardhatUserConfig, vars } from "hardhat/config";
 import "@nomicfoundation/hardhat-foundry";
 import "@nomicfoundation/hardhat-toolbox-viem";
 
+import { privateKeyToAccount } from "viem/accounts";
 const NETWORK = vars.get("NETWORK");
 const NETWORK_URL = vars.get("NETWORK_URL");
 const PRIVATE_KEY = vars.get("PRIVATE_KEY");

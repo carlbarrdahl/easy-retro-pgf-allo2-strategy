@@ -2,7 +2,8 @@
 pragma solidity ^0.8.9;
 
 import {BaseStrategy} from "allo-v2/contracts/strategies/BaseStrategy.sol";
-import {IAllo} from "allo-v2/contracts/core/interfaces/IAllo.sol";
+import {IAllo, Metadata, IStrategy} from "allo-v2/contracts/core/interfaces/IAllo.sol";
+import {Clone} from "allo-v2/contracts/core/libraries/Clone.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 contract EasyRPGFStrategy is BaseStrategy, ReentrancyGuard {
@@ -57,6 +58,34 @@ contract EasyRPGFStrategy is BaseStrategy, ReentrancyGuard {
             }
         }
     }
+
+    /*
+Custom strategies are not cloned by Allo2. This means they can only create 1 pool.
+This function creates a clone of the strategy contract
+*/
+    function createPool(
+        bytes32 _profileId,
+        address _token,
+        uint256 _amount,
+        Metadata memory _metadata,
+        address[] memory _managers
+    ) public {
+        IAllo(allo).createPoolWithCustomStrategy(
+            _profileId,
+            address(
+                IStrategy(
+                    Clone.createClone(address(this), _nonces[msg.sender]++)
+                )
+            ),
+            "",
+            _token,
+            _amount,
+            _metadata,
+            _managers
+        );
+    }
+
+    mapping(address => uint256) private _nonces;
 
     // Not used in this Strategy
     function _allocate(
