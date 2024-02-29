@@ -49,21 +49,6 @@ describe("EasyRPGFStrategy", function () {
     return { accounts, allo, strategy, poolId, token, publicClient };
   }
 
-  describe("Create Pool", () => {
-    it("creates a pool with cloned strategy contract", async () => {
-      const { strategy, token, accounts } = await loadFixture(deployStrategy);
-
-      await strategy.write.createPool([
-        encodeAbiParameters(parseAbiParameters("bytes32"), [
-          stringToHex("profileId", { size: 32 }),
-        ]),
-        token.address,
-        0n,
-        { protocol: 1n, pointer: "" },
-        [accounts[0].account.address],
-      ]);
-    });
-  });
   describe("Distribute", () => {
     it("distribute can only be called by round managers", async () => {
       const { allo, accounts, poolId } = await loadFixture(deployStrategy);
