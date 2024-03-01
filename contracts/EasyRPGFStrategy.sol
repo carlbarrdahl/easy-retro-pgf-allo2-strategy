@@ -21,6 +21,14 @@ contract EasyRPGFStrategy is BaseStrategy, ReentrancyGuard {
         emit Initialized(_poolId, _data);
     }
 
+    function withdraw(
+        address _recipient
+    ) external nonReentrant onlyPoolManager(msg.sender) {
+        IAllo.Pool memory pool = allo.getPool(poolId);
+        _transferAmount(pool.token, _recipient, poolAmount);
+        poolAmount = 0;
+    }
+
     function _distribute(
         address[] memory _recipientIds,
         bytes memory _recipientAmounts,
@@ -41,7 +49,6 @@ contract EasyRPGFStrategy is BaseStrategy, ReentrancyGuard {
         }
 
         IAllo.Pool memory pool = allo.getPool(poolId);
-
         for (uint256 i; i < payoutLength; ) {
             uint256 amount = amounts[i];
             address recipientAddress = _recipientIds[i];

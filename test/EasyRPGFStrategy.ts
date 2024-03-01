@@ -146,6 +146,25 @@ describe("EasyRPGFStrategy", function () {
       // User has not received anything
       expect(await token.read.balanceOf([recipients[0]])).to.eq(0n);
     });
+
+    it("withdraws pool tokens", async () => {
+      const { allo, accounts, token, poolId, strategy } = await loadFixture(
+        deployStrategy
+      );
+      const address = accounts[0].account.address;
+
+      await allo.write.fundPool([poolId, POOL_AMOUNT]);
+
+      // Make sure tokens have been transfered from account to pool
+      expect(await token.read.balanceOf([address])).to.eq(0n);
+      expect(await strategy.read.getPoolAmount()).to.eq(POOL_AMOUNT);
+
+      await strategy.write.withdraw([address]);
+
+      // Make sure tokens have been transfered back to account from pool
+      expect(await strategy.read.getPoolAmount()).to.eq(0n);
+      expect(await token.read.balanceOf([address])).to.eq(POOL_AMOUNT);
+    });
   });
 });
 
