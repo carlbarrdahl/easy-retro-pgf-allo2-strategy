@@ -53,8 +53,8 @@ contract EasyRPGFStrategy is BaseStrategy, ReentrancyGuard {
             uint256 amount = amounts[i];
             address recipientAddress = _recipientIds[i];
 
-            _transferAmount(pool.token, recipientAddress, amount);
             poolAmount -= amount;
+            _transferAmount(pool.token, recipientAddress, amount);
             emit Distributed(
                 recipientAddress,
                 recipientAddress,
