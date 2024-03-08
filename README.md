@@ -32,3 +32,12 @@ npx hardhat vars set NETWORK_URL https://mainnet.g.alchemy.com/v2/<api-key>
 ```sh
 npm run deploy -- --network $(npx hardhat vars get NETWORK)
 ```
+
+## Verify
+
+Copy the deployed contract address and pase in place of `<STRATEGY_ADDRESS>` below
+
+```sh
+npx hardhat verify --network $(npx hardhat vars get NETWORK) <STRATEGY_ADDRESS> --constructor-args scripts/args.js
+
+```
