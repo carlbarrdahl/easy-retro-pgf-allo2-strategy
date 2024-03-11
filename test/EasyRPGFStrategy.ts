@@ -159,7 +159,7 @@ describe("EasyRPGFStrategy", function () {
       expect(await token.read.balanceOf([address])).to.eq(0n);
       expect(await strategy.read.getPoolAmount()).to.eq(POOL_AMOUNT);
 
-      await strategy.write.withdraw([address]);
+      await strategy.write.withdraw([token.address, address]);
 
       // Make sure tokens have been transfered back to account from pool
       expect(await strategy.read.getPoolAmount()).to.eq(0n);
