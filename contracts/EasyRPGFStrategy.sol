@@ -2,7 +2,7 @@
 pragma solidity ^0.8.9;
 
 import {BaseStrategy} from "allo-v2/contracts/strategies/BaseStrategy.sol";
-import {IAllo, Metadata} from "allo-v2/contracts/core/interfaces/IAllo.sol";
+import {IAllo} from "allo-v2/contracts/core/interfaces/IAllo.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 contract EasyRPGFStrategy is BaseStrategy, ReentrancyGuard {
