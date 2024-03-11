@@ -21,6 +21,8 @@ contract EasyRPGFStrategy is BaseStrategy {
         emit Initialized(_poolId, _data);
     }
 
+    /// @notice Withdraw pool funds
+    /// @param _recipient Address to send the funds to
     function withdraw(address _recipient) external onlyPoolManager(msg.sender) {
         IAllo.Pool memory pool = allo.getPool(poolId);
         uint256 _poolAmount = poolAmount;
@@ -28,6 +30,9 @@ contract EasyRPGFStrategy is BaseStrategy {
         _transferAmount(pool.token, _recipient, _poolAmount);
     }
 
+    /// @notice Distribute pool funds
+    /// @param _recipientIds Array of addresses to send the funds to
+    /// @param _recipientAmounts Array of amounts that maps to _recipientIds array
     function _distribute(
         address[] memory _recipientIds,
         bytes memory _recipientAmounts,
