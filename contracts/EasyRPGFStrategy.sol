@@ -3,9 +3,8 @@ pragma solidity ^0.8.9;
 
 import {BaseStrategy} from "allo-v2/contracts/strategies/BaseStrategy.sol";
 import {IAllo} from "allo-v2/contracts/core/interfaces/IAllo.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract EasyRPGFStrategy is BaseStrategy, ReentrancyGuard {
+contract EasyRPGFStrategy is BaseStrategy {
     error INPUT_LENGTH_MISMATCH();
     error NOOP();
 
@@ -22,12 +21,11 @@ contract EasyRPGFStrategy is BaseStrategy, ReentrancyGuard {
         emit Initialized(_poolId, _data);
     }
 
-    function withdraw(
-        address _recipient
-    ) external nonReentrant onlyPoolManager(msg.sender) {
+    function withdraw(address _recipient) external onlyPoolManager(msg.sender) {
         IAllo.Pool memory pool = allo.getPool(poolId);
-        _transferAmount(pool.token, _recipient, poolAmount);
+        uint256 _poolAmount = poolAmount;
         poolAmount = 0;
+        _transferAmount(pool.token, _recipient, _poolAmount);
     }
 
     function _distribute(
