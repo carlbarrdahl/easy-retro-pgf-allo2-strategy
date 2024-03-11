@@ -7,6 +7,7 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.
 
 contract EasyRPGFStrategy is BaseStrategy, ReentrancyGuard {
     error INPUT_LENGTH_MISMATCH();
+    error NOOP();
 
     constructor(
         address _allo,
@@ -68,14 +69,15 @@ contract EasyRPGFStrategy is BaseStrategy, ReentrancyGuard {
     }
 
     // Not used in this Strategy
-    function _allocate(
-        bytes memory _data,
-        address _sender
-    ) internal virtual override {}
+    function _allocate(bytes memory, address) internal virtual override {
+        revert NOOP();
+    }
 
     function _getRecipientStatus(
-        address _recipientId
-    ) internal view virtual override returns (Status) {}
+        address
+    ) internal view virtual override returns (Status) {
+        revert NOOP();
+    }
 
     function _isValidAllocator(
         address _allocator
