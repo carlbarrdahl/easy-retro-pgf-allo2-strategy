@@ -74,6 +74,8 @@ contract EasyRPGFStrategy is BaseStrategy {
         }
     }
 
+    receive() external payable {}
+
     // Not used in this Strategy
     function _allocate(bytes memory, address) internal virtual override {
         revert NOOP();

@@ -1,54 +1,17 @@
 import hre from "hardhat";
 import { expect } from "chai";
-import { encodeAbiParameters, parseAbiParameters, stringToHex } from "viem";
+import {
+  type Address,
+  encodeAbiParameters,
+  parseAbiParameters,
+  stringToHex,
+} from "viem";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { loadFixture } from "@nomicfoundation/hardhat-toolbox-viem/network-helpers";
 
 const POOL_AMOUNT = 500n;
 
 describe("EasyRPGFStrategy", function () {
-  async function deployStrategy() {
-    const accounts = await hre.viem.getWalletClients();
-
-    const allo = await hre.viem.deployContract("LocalAllo");
-    const registry = await hre.viem.deployContract("LocalRegistry");
-    const token = await hre.viem.deployContract("LocalToken");
-
-    const deployerAddress = accounts[0].account.address;
-    await token.write.mint([deployerAddress, POOL_AMOUNT]);
-    await token.write.increaseAllowance([allo.address, POOL_AMOUNT]);
-
-    await allo.write.initialize([
-      deployerAddress,
-      registry.address,
-      deployerAddress,
-      0n,
-      0n,
-    ]);
-
-    const strategy = await hre.viem.deployContract("EasyRPGFStrategy", [
-      allo.address,
-      "EasyRPGFStrategy",
-    ]);
-
-    await allo.write.createPoolWithCustomStrategy([
-      encodeAbiParameters(parseAbiParameters("bytes32"), [
-        stringToHex("profileId", { size: 32 }),
-      ]),
-      strategy.address,
-      encodeAbiParameters(parseAbiParameters("uint256"), [0n]),
-      token.address, // token
-      0n, // amount
-      { protocol: 1n, pointer: "" }, // metadata
-      [deployerAddress],
-    ]);
-
-    const poolId = 1n;
-
-    const publicClient = await hre.viem.getPublicClient();
-    return { accounts, allo, strategy, poolId, token, publicClient };
-  }
-
   describe("Distribute", () => {
     it("distribute can only be called by round managers", async () => {
       const { allo, accounts, poolId } = await loadFixture(deployStrategy);
@@ -82,6 +45,13 @@ describe("EasyRPGFStrategy", function () {
       await expect(
         allo.write.distribute([poolId, recipients, amounts])
       ).to.be.rejectedWith("INPUT_LENGTH_MISMATCH()");
+    });
+
+    it("funds with ETH", async () => {
+      const { allo, poolId, strategy } = await loadFixture(deployStrategyETH);
+      const fundAmount = 10n;
+      await allo.write.fundPool([poolId, fundAmount], { value: fundAmount });
+      expect(await strategy.read.getPoolAmount()).to.eq(fundAmount);
     });
 
     it("pays out the correct amount", async () => {
@@ -170,4 +140,66 @@ describe("EasyRPGFStrategy", function () {
 
 function encodeAmounts(amounts: bigint[]) {
   return encodeAbiParameters(parseAbiParameters("uint256[]"), [amounts]);
+}
+
+async function setup() {
+  const accounts = await hre.viem.getWalletClients();
+  const allo = await hre.viem.deployContract("LocalAllo");
+  const registry = await hre.viem.deployContract("LocalRegistry");
+  const deployerAddress = accounts[0].account.address;
+  await allo.write.initialize([
+    deployerAddress,
+    registry.address,
+    deployerAddress,
+    0n,
+    0n,
+  ]);
+
+  const strategy = await hre.viem.deployContract("EasyRPGFStrategy", [
+    allo.address,
+    "EasyRPGFStrategy",
+  ]);
+  return { accounts, allo, strategy };
+}
+async function deploy(token: Address, { accounts, allo, strategy }: any) {
+  const deployerAddress = accounts[0].account?.address;
+  await allo.write.createPoolWithCustomStrategy(
+    [
+      encodeAbiParameters(parseAbiParameters("bytes32"), [
+        stringToHex("profileId", { size: 32 }),
+      ]),
+      strategy.address,
+      encodeAbiParameters(parseAbiParameters("uint256"), [0n]),
+      token,
+      0n,
+      { protocol: 1n, pointer: "" }, // metadata
+      [deployerAddress],
+    ],
+    { value: 0n }
+  );
+
+  const poolId = 1n;
+
+  const publicClient = await hre.viem.getPublicClient();
+  return { poolId, token, publicClient };
+}
+
+async function deployStrategyETH() {
+  const alloSetup = await setup();
+  const deployment = await deploy(
+    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+    alloSetup
+  );
+  return { ...alloSetup, ...deployment };
+}
+
+async function deployStrategy() {
+  const alloSetup = await setup();
+  const token = await hre.viem.deployContract("LocalToken");
+
+  const deployerAddress = alloSetup.accounts[0].account.address;
+  await token.write.mint([deployerAddress, POOL_AMOUNT]);
+  await token.write.increaseAllowance([alloSetup.allo.address, POOL_AMOUNT]);
+  const deployment = await deploy(token.address, alloSetup);
+  return { ...alloSetup, ...deployment, token };
 }
