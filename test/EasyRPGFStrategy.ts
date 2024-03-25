@@ -10,6 +10,7 @@ import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { loadFixture } from "@nomicfoundation/hardhat-toolbox-viem/network-helpers";
 
 const POOL_AMOUNT = 500n;
+const ethAddress = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
 describe("EasyRPGFStrategy", function () {
   describe("Distribute", () => {
@@ -49,9 +50,8 @@ describe("EasyRPGFStrategy", function () {
 
     it("funds with ETH", async () => {
       const { allo, poolId, strategy } = await loadFixture(deployStrategyETH);
-      const fundAmount = 10n;
-      await allo.write.fundPool([poolId, fundAmount], { value: fundAmount });
-      expect(await strategy.read.getPoolAmount()).to.eq(fundAmount);
+      await allo.write.fundPool([poolId, POOL_AMOUNT], { value: POOL_AMOUNT });
+      expect(await strategy.read.getPoolAmount()).to.eq(POOL_AMOUNT);
     });
 
     it("pays out the correct amount", async () => {
@@ -135,6 +135,22 @@ describe("EasyRPGFStrategy", function () {
       expect(await strategy.read.getPoolAmount()).to.eq(0n);
       expect(await token.read.balanceOf([address])).to.eq(POOL_AMOUNT);
     });
+    it("withdraws pool ETH", async () => {
+      const { allo, accounts, poolId, strategy } = await loadFixture(
+        deployStrategyETH
+      );
+      const address = accounts[0].account.address;
+
+      await allo.write.fundPool([poolId, POOL_AMOUNT], { value: POOL_AMOUNT });
+
+      // Make sure tokens have been transfered from account to pool
+      expect(await strategy.read.getPoolAmount()).to.eq(POOL_AMOUNT);
+
+      await strategy.write.withdraw([ethAddress, address]);
+
+      // Make sure tokens have been transfered back to account from pool
+      expect(await strategy.read.getPoolAmount()).to.eq(0n);
+    });
   });
 });
 
@@ -186,10 +202,7 @@ async function deploy(token: Address, { accounts, allo, strategy }: any) {
 
 async function deployStrategyETH() {
   const alloSetup = await setup();
-  const deployment = await deploy(
-    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-    alloSetup
-  );
+  const deployment = await deploy(ethAddress, alloSetup);
   return { ...alloSetup, ...deployment };
 }
 
