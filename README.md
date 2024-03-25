@@ -22,21 +22,19 @@ Configure environment variables
 # Configure key to a funded wallet deploying the strategy contract
 npx hardhat vars set PRIVATE_KEY 0x...
 
-# Network name (optimism, optimismGoerli)
-npx hardhat vars set NETWORK mainnet
+# Alchemy API key
+npx hardhat vars set ALCHEMY_KEY
 
-# Network url (Alchemy or Infura for example)
-npx hardhat vars set NETWORK_URL https://mainnet.g.alchemy.com/v2/<api-key>
 ```
 
 ```sh
-npm run deploy -- --network $(npx hardhat vars get NETWORK)
+npm run deploy -- --network mainnet # See hardhat config for available networks
 ```
 
 Deploy token for testing
 
 ```sh
-npx hardhat --network $(npx hardhat vars get NETWORK) run scripts/deploy-token.ts
+npx hardhat --network mainnet run scripts/deploy-token.ts
 ```
 
 ## Verify
@@ -44,6 +42,6 @@ npx hardhat --network $(npx hardhat vars get NETWORK) run scripts/deploy-token.t
 Copy the deployed contract address and pase in place of `<STRATEGY_ADDRESS>` below
 
 ```sh
-npx hardhat verify --network $(npx hardhat vars get NETWORK) <STRATEGY_ADDRESS> --constructor-args scripts/args.js
+npx hardhat verify --network celo 0xa3c5a2ea8ca2060e00761069b23da5171146a747 --constructor-args scripts/args.js
 
 ```
