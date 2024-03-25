@@ -34,6 +34,7 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
+      optimisticEthereum: ETHERSCAN_KEY,
       optimismSepolia: ETHERSCAN_KEY,
       celo: CELO_ETHERSCAN_KEY,
     },
