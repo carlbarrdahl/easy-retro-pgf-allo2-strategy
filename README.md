@@ -42,6 +42,6 @@ npx hardhat --network optimismSepolia run scripts/deploy-token.ts
 Copy the deployed contract address and pase in place of `<STRATEGY_ADDRESS>` below
 
 ```sh
-npx hardhat verify --network optimismSepolia 0x9b41da54ae0686a6bfdbc55fc82512b1d7d2542f --constructor-args scripts/args.js
+npx hardhat verify --network optimismSepolia 0xa20f3a96f771fc8cc3b44e3a4ac8bcf51654ff0f --constructor-args scripts/args.js
 
 ```
