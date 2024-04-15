@@ -31,6 +31,11 @@ const config: HardhatUserConfig = {
       url: "https://forno.celo.org",
       chainId: 42220,
     },
+    filecoin: {
+      accounts: [PRIVATE_KEY],
+      chainId: 314,
+      url: "https://api.node.glif.io",
+    },
   },
   etherscan: {
     apiKey: {
