@@ -189,13 +189,16 @@ async function deploy(
       encodeAbiParameters(
         parseAbiParameters([
           "HedgeyParams data",
-          "struct HedgeyParams { address adminAddress; address contractAddress; uint256 duration; }",
+          "struct HedgeyParams { address adminAddress; address contractAddress; uint256 duration; uint256 cliff; uint256 period; bool adminTransferOBO}",
         ]),
         [
           {
             adminAddress: accounts[0].account.address,
             contractAddress: hedgey.address,
             duration: 10n,
+            cliff: 0n,
+            period: 1n,
+            adminTransferOBO: false,
           },
         ]
       ),

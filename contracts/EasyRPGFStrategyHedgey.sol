@@ -27,6 +27,9 @@ contract EasyRPGFStrategyHedgey is BaseStrategy {
         address adminAddress;
         address contractAddress;
         uint256 duration;
+        uint256 cliff;
+        uint256 period;
+        bool adminTransferOBO;
     }
     HedgeyParams public hedgey;
 
@@ -95,11 +98,11 @@ contract EasyRPGFStrategyHedgey is BaseStrategy {
                 pool.token,
                 amount,
                 block.timestamp,
-                0, // No cliff
+                hedgey.cliff,
                 rate,
-                1,
+                hedgey.period,
                 hedgey.adminAddress,
-                true
+                hedgey.adminTransferOBO
             );
             emit Distributed(
                 recipientAddress,
