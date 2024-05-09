@@ -81,13 +81,13 @@ contract EasyRPGFStrategyHedgey is BaseStrategy {
         }
 
         IAllo.Pool memory pool = allo.getPool(poolId);
+        IERC20(pool.token).approve(hedgey.contractAddress, poolAmount);
         for (uint256 i; i < payoutLength; ) {
             uint256 amount = amounts[i];
             address recipientAddress = _recipientIds[i];
 
             poolAmount -= amount;
 
-            IERC20(pool.token).approve(hedgey.contractAddress, amount);
             uint256 rate = amount / hedgey.duration;
 
             ITokenVestingPlans(hedgey.contractAddress).createPlan(
