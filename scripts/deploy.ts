@@ -8,7 +8,13 @@ async function main() {
     "EasyRPGFStrategy",
   ]);
 
-  console.log(`Strategy deployed to ${strategy.address}`);
+  const hedgeyStrategy = await hre.viem.deployContract(
+    "EasyRPGFStrategyHedgey",
+    [alloAddress, "EasyRPGFStrategyHedgey"]
+  );
+
+  console.log(`EasyRPGFStrategy deployed to ${strategy.address}`);
+  console.log(`EasyRPGFStrategyHedgey deployed to ${hedgeyStrategy.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
