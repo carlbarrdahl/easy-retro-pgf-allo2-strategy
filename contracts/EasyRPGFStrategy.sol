@@ -5,6 +5,14 @@ import {BaseStrategy} from "allo-v2/contracts/strategies/BaseStrategy.sol";
 import {IAllo} from "allo-v2/contracts/core/interfaces/IAllo.sol";
 
 contract EasyRPGFStrategy is BaseStrategy {
+
+    event Distributed(
+        bytes32 indexed recipientId,
+        address indexed recipientAddress,
+        uint256 amount,
+        address indexed sender
+    );
+
     error INPUT_LENGTH_MISMATCH();
     error NOOP();
 
@@ -35,14 +43,14 @@ contract EasyRPGFStrategy is BaseStrategy {
 
     /// @notice Distribute pool funds
     /// @param _recipientIds Array of addresses to send the funds to
-    /// @param _recipientAmounts Array of amounts that maps to _recipientIds array
+    /// @param _recipientsData Array of amounts that maps to _recipientIds array
     function _distribute(
         address[] memory _recipientIds,
-        bytes memory _recipientAmounts,
+        bytes memory _recipientsData,
         address _sender
     ) internal virtual override onlyPoolManager(_sender) {
         // Decode amounts from memory param
-        uint256[] memory amounts = abi.decode(_recipientAmounts, (uint256[]));
+        (uint256[] memory amounts, bytes32[] memory applicationIds) = abi.decode(_recipientsData, (uint256[], bytes32[]));
 
         uint256 payoutLength = _recipientIds.length;
 
@@ -54,16 +62,21 @@ contract EasyRPGFStrategy is BaseStrategy {
         if (payoutLength != amounts.length) {
             revert INPUT_LENGTH_MISMATCH();
         }
+        // Assert recipient and Ids length are equal
+        if (payoutLength != applicationIds.length) {
+            revert INPUT_LENGTH_MISMATCH();
+        }
 
         IAllo.Pool memory pool = allo.getPool(poolId);
         for (uint256 i; i < payoutLength; ) {
             uint256 amount = amounts[i];
             address recipientAddress = _recipientIds[i];
+            bytes32 applicationId = applicationIds[i];
 
             poolAmount -= amount;
             _transferAmount(pool.token, recipientAddress, amount);
             emit Distributed(
-                recipientAddress,
+                applicationId,
                 recipientAddress,
                 amount,
                 _sender
